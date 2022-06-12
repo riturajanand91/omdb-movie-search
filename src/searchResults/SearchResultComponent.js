@@ -12,6 +12,7 @@ import Grid from '@mui/material/Grid';
 
 
 const SearchResultComponent = (props) => {
+   
     return (
         <Container sx={{ mt: 3 }}>
             <Grid container spacing={2}>

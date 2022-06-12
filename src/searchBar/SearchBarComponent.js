@@ -5,28 +5,54 @@ import { fetchApi } from '../api/httpClient';
 import Typography from '@mui/material/Typography';
 import { Box, Container } from '@mui/material';
 import SearchResultComponent from '../searchResults/SearchResultComponent';
+import axios from "axios";
 
 const SearchBarComponent = () => {
-    const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState("");
     const [movies, setMovies] = useState([]);
-    const handleSubmit = async (e) => {
+    const url = "https://jsonmock.hackerrank.com/api/movies";
+
+    /** api call using axios within component start */
+    const handleSubmitWithinComponentAxios = (e) => {
         e.preventDefault();
-        setLoading(true);
+        getMoviesUsingAxios(search);
+    };
+    const getMoviesUsingAxios = (searchTerm) => {
+        axios.get(`${url}?Year=${searchTerm}`)
+            .then((response) => {
+                console.log(response.data.data);
+                setMovies(response.data.data);
+            })
+            .catch((error) => console.error(error))
+    }
+    /** api call using axios within component end */
+
+    /**  api call using axios http file start*/
+    const handleSubmitWithExternalAxios = async (e) => {
+        e.preventDefault();
         const data = await fetchApi(search);
         setMovies(data.data.Search);
-        // console.log(data.data.Search);
-        // .then(res => {
-        //     //do something
-        //     console.log(res.data.search);
-        //     setMovies(res.data.search);
-        // })
-        // .catch(err => {
-        //     // catch error
-        //     console.error(err);
-        // });
+        console.log(data.data.Search);
+    }
+    /**  api call using axios http file end*/
 
+    /**  api call using react fetch start*/
+    const handleSubmitUsingFetch = (e) => {
+        e.preventDefault();
+        getMoviesUsingFetch(search);
+        // using same component api call using axios
     };
+    const getMoviesUsingFetch = (searchTerm) => {
+        fetch(`${url}?Year=${searchTerm}`)
+            .then(res => res.json())
+            .then((result) => {
+                console.log(result.data);
+                setMovies(result.data);
+            })
+            .catch((error) => console.error(error));
+    }
+    /**  api call using react fetch end*/
+
     return (
         <Container maxWidth="xl" sx={{ p: '0px !important' }}>
             <Box sx={{
@@ -34,7 +60,7 @@ const SearchBarComponent = () => {
             }} noValidate autoComplete="off">
                 <Container>
                     <Typography variant="h4"> OMDb Movie Search UI </Typography>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmitWithExternalAxios}>
                         <div>
                             <TextField id="Search Movie" value={search} onChange={(e) => setSearch(e.target.value)} label="Search Movie" margin="normal" variant="outlined" />
                         </div>
